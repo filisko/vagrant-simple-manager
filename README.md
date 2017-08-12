@@ -12,7 +12,7 @@ chmod +x vagrant-sm.sh
 
 ## Steps
 
-Once you start the script, the main screen that you will is list of your current vagrant machines.  
+Once you start the script, the main screen that you will see is a list of your current vagrant machines.  
 ![1. Machines](/images/1.png)
 
 If you select the vagrant machine and then press 'Manage', you will get a list of the available options (only 1 for now) while the vagrant machine is off (see state 'poweroff' on previous image).  
