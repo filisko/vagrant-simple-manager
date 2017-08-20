@@ -7,10 +7,22 @@ if ! which vagrant >/dev/null; then
     exit
 fi
 
-# Check if there any machines at all!
+# Get cached machines
 function get_machines() {
-    # echo "9abfff8" "somemachine" "virtualbox" "asd" "/home/user/somemachine"
     vagrant global-status | tail -n+3 | head -n -7
+}
+
+# Get non-cached machines
+function get_refreshed_machines() {
+    cached_machines=$(get_machines)
+
+    # refresh machines
+    for machine_id in "$cached_machines"
+    do
+        vagrant status $machine_id &> /dev/null
+    done
+
+    echo "$(get_machines)"
 }
 
 # Get machine path (used for SSH)
@@ -23,7 +35,12 @@ function get_machine_status() {
     get_machines | grep "$1" | awk '{print $4}'
 }
 
-# Check whether machine is running or not
+# Get machine status (used to detect which actions are possible)
+function get_machine_id() {
+    get_machines | grep "$1" | awk '{print $1}'
+}
+
+# Check whether a machine is running or not
 function is_machine_on() {
     if [ $(get_machine_status "$1") = 'running' ]; then
         echo '1'
@@ -31,7 +48,7 @@ function is_machine_on() {
 }
 
 while true; do
-    machines=$(get_machines)
+    machines=$(get_refreshed_machines)
 
     if [ -z "$machines" ]; then
         zenity --warning --title="$TITLE" --text="You don't have any vagrant machine! Create one first please."
