@@ -1,6 +1,6 @@
 # Vagrant Simple Manager v1.0
 
-This script provides a simple GUI for Vagrant (for lazy people) that you could use to start, stop, restart and SSH into vagrant machines with your default terminal emulator.
+This script provides a simple GUI for Vagrant (for lazy people) that you could use to start, stop, restart and SSH into vagrant machines with your default terminal emulator. I would recommend you to use this tool if you have more than 5 vagrant machines.
 
 ## Download
 To download and execute the script simply do the following:
@@ -12,7 +12,7 @@ chmod +x vagrant-sm.sh
 
 ## Steps
 
-Once you start the script, the main screen that you will is list of your current vagrant machines.  
+Once you start the script, the main screen that you will see is a list of your current vagrant machines.  
 ![1. Machines](/images/1.png)
 
 If you select the vagrant machine and then press 'Manage', you will get a list of the available options (only 1 for now) while the vagrant machine is off (see state 'poweroff' on previous image).  
