@@ -7,22 +7,18 @@ if ! which vagrant >/dev/null; then
     exit
 fi
 
-# Get cached machines
+# Get machines
 function get_machines() {
     vagrant global-status | tail -n+3 | head -n -7
 }
 
-# Get non-cached machines
-function get_refreshed_machines() {
-    cached_machines=$(get_machines)
-
-    # refresh machines
-    for machine_id in "$cached_machines"
+# Refresh machines to later get them
+function refresh_machines() {
+    # refresh cached machines
+    for machine_id in $(get_machines | awk '{print $1}')
     do
-        vagrant status $machine_id &> /dev/null
+        vagrant status $machine_id
     done
-
-    echo "$(get_machines)"
 }
 
 # Get machine path (used for SSH)
@@ -35,11 +31,6 @@ function get_machine_status() {
     get_machines | grep "$1" | awk '{print $4}'
 }
 
-# Get machine status (used to detect which actions are possible)
-function get_machine_id() {
-    get_machines | grep "$1" | awk '{print $1}'
-}
-
 # Check whether a machine is running or not
 function is_machine_on() {
     if [ $(get_machine_status "$1") = 'running' ]; then
@@ -47,12 +38,30 @@ function is_machine_on() {
     fi
 }
 
-while true; do
-    machines=$(get_refreshed_machines)
+# Variables
+declare machines
+declare loaded
 
-    if [ -z "$machines" ]; then
-        zenity --warning --title="$TITLE" --text="You don't have any vagrant machine! Create one first please."
-        exit
+while true; do
+    # refresh vagrant machines list only first time
+    if [ -z "$loaded" ]; then
+        (
+            refresh_machines
+        ) |
+        zenity --progress \
+          --title="$TITLE" \
+          --text="Loading fresh list of vagrant machines ..." \
+          --pulsate \
+          --no-cancel \
+          --auto-close
+
+        loaded="1"
+        machines=$(get_machines)
+
+        if [ -z "$machines" ]; then
+            zenity --warning --title="$TITLE" --text="You don't have any vagrant machine!"
+            exit
+        fi
     fi
 
 	id=$(zenity --list \
